@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyj.dao.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cyj.domain.User">
+        <id column="id" property="id"/>
+        <result column="number" property="number"/>
+        <result column="password" property="password"/>
+        <result column="username" property="username"/>
+        <result column="sex" property="sex"/>
+        <result column="college" property="college"/>
+        <result column="grade" property="grade"/>
+        <result column="major" property="major"/>
+        <result column="student_type" property="studentType"/>
+        <result column="email" property="email"/>
+        <result column="tel" property="tel"/>
+        <result column="photo" property="photo"/>
+        <result column="remark" property="remark"/>
+        <result column="type" property="type"/>
+        <result column="status" property="status"/>
+        <result column="intotime" property="intotime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            id, number, password, username, sex, college, grade, major, student_type, email, tel, photo, remark, type,status,intotime
+        </sql>
+    <select id="queryUserAll" parameterType="com.cyj.domain.User" resultType="com.cyj.domain.User">
+        SELECT *
+        FROM `user`
+        <where>
+            <if test="type != null and type != ''">and type = #{type}</if>
+            <if test="college != null and college != ''">and college = #{college}</if>
+            <if test="grade != null and grade != ''">and grade = #{grade}</if>
+            <if test="number != null and number != ''">and number = #{number}</if>
+            <if test="sex != null and sex != ''">and sex = #{sex}</if>
+            <if test="username != null and username != ''">and username = #{username}</if>
+            <if test="major != null and major != ''">and major = #{major}</if>
+            <if test="studentType != null and studentType != ''">and student_type = #{studentType}</if>
+            <if test="status != null and status != ''">and status = #{status}</if>
+        </where>
+    </select>
+<!--    登录检查学号秘密和类型-->
+    <select id="queryUserByNameAndPwd" resultType="com.cyj.domain.User"
+            parameterType="com.cyj.domain.User">
+        select * from user  where number =#{number} and password=#{password}
+        and  type=#{type}
+    </select>
+
+<!--    邮箱登入-->
+    <select id="queryUserByEmailAndPwd" resultType="com.cyj.domain.User"
+            parameterType="com.cyj.domain.User">
+        select * from user  where email =#{email} and password=#{password}
+        and  type=#{type}
+    </select>
+<!--通过学号查询学生-->
+    <select id="queryByAccount" resultType="com.cyj.domain.User"
+            parameterType="com.cyj.domain.User">
+            select * from user  where number =#{number}
+            and  type=#{type} limit 1
+    </select>
+
+
+    <!--通过学号查询学生-->
+    <select id="findIdByNumberAndType" resultType="integer"
+            parameterType="com.cyj.domain.User">
+            select id from user  where number =#{number}
+            and  type=#{type}
+    </select>
+
+    <select id="findAll" parameterType="com.cyj.domain.User" resultType="com.cyj.domain.User">
+        SELECT *
+        FROM `user`
+        <where>
+            <if test="type != null and type != ''">and type = #{type}</if>
+            <if test="college != null and college != ''">and college = #{college}</if>
+            <if test="grade != null and grade != ''">and grade = #{grade}</if>
+            <if test="number != null and number != ''">and number = #{number}</if>
+            <if test="sex != null and sex != ''">and sex = #{sex}</if>
+            <if test="username != null and username != ''">and username = #{username}</if>
+            <if test="major != null and major != ''">and major = #{major}</if>
+            <if test="studentType != null and studentType != ''">and studentType = #{studentType}</if>
+            <if test="status != null and status != ''">and status = #{status}</if>
+            <if test="remark != null and remark != ''">and remark like '%${remark}%'</if>
+        </where>
+    </select>
+</mapper>

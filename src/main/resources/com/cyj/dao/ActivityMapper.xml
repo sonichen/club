@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyj.dao.ActivityMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cyj.domain.Activity">
+        <id column="id" property="id"/>
+        <result column="club_id" property="clubId"/>
+        <result column="begin_time" property="beginTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="title" property="title"/>
+        <result column="context" property="context"/>
+        <result column="creator" property="creator"/>
+        <result column="create_time" property="createTime"/>
+        <result column="place" property="place"/>
+        <result column="remark" property="remark"/>
+        <result column="approver" property="approver"/>
+        <result column="status" property="status"/>
+        <result column="check_time" property="checkTime"/>
+        <result column="re_time" property="reTime"/>
+        <result column="mcount" property="mcount"/>
+
+        <result column="projecttype" property="projecttype"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            id, club_id, begin_time, end_time, title, context, creator, create_time, place, remark, approver, status, check_time, re_time, mcount,projecttype
+        </sql>
+<!--    <resultMap id="queryActivityAllMap" type="com.cyj.domain.Activity" extends="BaseResultMap">-->
+<!--        <association property="activity" javaType="com.cyj.domain.Activity">-->
+<!--            <id column="id" property="id"></id>-->
+<!--            <result column="title" property="title"></result>-->
+<!--        </association>-->
+<!--    </resultMap>-->
+<!--    <select id="queryActivityAll" parameterType="com.cyj.domain.Activity" resultType="com.cyj.domain.Activity">-->
+<!--        select * from activity-->
+<!--        <where>-->
+<!--                <if test="title!=null and title!=''">-->
+<!--                    and title =#{title}-->
+<!--                </if>-->
+<!--        </where>-->
+<!--    </select>-->
+
+    <select id="queryActivityAll" parameterType="com.cyj.domain.Activity" resultType="com.cyj.domain.Activity">
+        SELECT a.*,c.`name` as 'clubName',u.`username` AS 'leaderName',u2.`username` AS 'teacherName'
+        FROM `activity` a
+        LEFT JOIN `club` c ON a.`club_id`=c.`id`
+        LEFT JOIN `user` u ON u.`number`=a.`creator`
+        LEFT JOIN `user` u2 ON u2.`number`=a.`approver`
+        <where>
+            <if test="title!=null">
+                and a.title = #{title}
+            </if>
+            <if test="clubId!=null">
+                and a.club_id = #{clubId}
+            </if>
+            <if test="status!=null">
+                and a.status = #{status}
+            </if>
+            <if test="place!=null">
+                and a.place = #{place}
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteByClubId" parameterType="String">
+        DELETE a
+        FROM activity a
+        JOIN `club` c ON a.`club_id`=c.`id`
+        <where>
+            <if test="clubId!=null">
+                and a.club_id = #{clubId}
+            </if>
+        </where>
+    </delete>
+    <select id="count" parameterType="int" resultType="int">
+        select count(*)
+        from activity
+        <where>
+            <if test="status!=null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+</mapper>

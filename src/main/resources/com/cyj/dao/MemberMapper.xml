@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyj.dao.MemberMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cyj.domain.Member">
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="type" property="type"/>
+        <result column="create_time" property="createTime"/>
+        <result column="into_time" property="intoTime"/>
+        <result column="remark" property="remark"/>
+        <result column="rw_time" property="rwTime"/>
+        <result column="status" property="status"/>
+        <result column="club_id" property="clubId"/>
+        <result column="checker" property="checker"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            id, student_id, type, create_time, into_time, remark, rw_time,status,club_id,checker
+        </sql>
+
+    <select id="queryMemberAll" parameterType="com.cyj.domain.Member" resultType="com.cyj.domain.Member">
+        SELECT m.*, c.`name` AS 'clubName', u1.`username` AS 'studentName' , u2.`username` AS 'checkerName'
+        FROM `member` m
+        LEFT JOIN `club` c ON c.`id`=m.`club_id`
+        LEFT JOIN  `user` u1 ON u1.`number`=m.`student_id`
+        LEFT JOIN  `user` u2 ON u2.`number`=m.`checker`
+        <where>
+            <if test="status!=null">
+                and m.status = #{status}
+            </if>
+
+            <if test="type!=null">
+                and m.type = #{type}
+            </if>
+            <if test="clubId!=null">
+                and m.club_id = #{clubId}
+            </if>
+            <if test="studentId!=null">
+                and m.student_id = #{studentId}
+            </if>
+        </where>
+    </select>
+
+    <select id="memberList" parameterType="com.cyj.domain.Member" resultType="com.cyj.domain.Member">
+        SELECT m.*,u1.`username` AS 'studentName', u2.`username` AS 'checkerName'
+        FROM `member`  m
+        LEFT JOIN `user` u1 ON m.`student_id`=u1.`number`
+        LEFT JOIN `user` u2 ON m.`checker`=u2.`number`
+        WHERE club_id=1
+        <where>
+            <if test="status!=null">
+                and m.status = #{status}
+            </if>
+
+            <if test="type!=null">
+                and m.type = #{type}
+            </if>
+            <if test="clubId!=null">
+                and m.club_id = #{clubId}
+            </if>
+        </where>
+    </select>
+    <delete id="deleteByClubId" parameterType="String">
+        DELETE a
+        FROM member a
+        JOIN `club` c ON a.`club_id`=c.`id`
+        <where>
+            <if test="clubId!=null">
+                and a.club_id = #{clubId}
+            </if>
+        </where>
+    </delete>
+<select id="findByStudentId" resultType="com.cyj.domain.Member" parameterType="com.cyj.domain.Member">
+
+    SELECT * FROM
+    `member`
+    <where>
+        <if test="studentId!=null">
+            and student_id = #{studentId}
+        </if>
+        <if test="clubId!=null">
+            and club_id = #{clubId}
+        </if>
+        <if test="status!=null">
+            and status = #{status}
+        </if>
+    </where>
+
+
+</select>
+    <select id="findMyClub" resultType="com.cyj.domain.Club" parameterType="string">
+        SELECT c.*
+        FROM `club` c
+        LEFT JOIN `member` m ON c.`id`=m.`student_id`
+        <where>
+            <if test="studentId!=null">
+                and student_id = #{studentId}
+            </if>
+
+                and m.status = 1
+
+        </where>
+    </select>
+
+    <select id="findMyManagerClub" resultType="com.cyj.domain.Club" parameterType="string">
+        SELECT c.*
+        FROM `club` c
+        LEFT JOIN `member` m ON c.`id`=m.`student_id`
+        <where>
+            <if test="studentId!=null">
+                and student_id = #{studentId}
+            </if>
+
+                and m.type = 2
+            and m.status = 1
+
+        </where>
+    </select>
+    <select id="countMemeber" parameterType="com.cyj.domain.Club" resultType="int">
+        SELECT COUNT(1)
+        FROM `member`
+        <if test="clubId!=null">
+            and club_id = #{clubId}
+        </if>
+        <if test="status!=null">
+            and status = #{status}
+        </if>
+    </select>
+</mapper>

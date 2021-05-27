@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyj.dao.ClubtypeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cyj.domain.Clubtype">
+        <id column="id" property="id"/>
+        <result column="type" property="type"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            id, type, remark
+        </sql>
+
+    <select id="queryClubtypeAll" parameterType="com.cyj.domain.Clubtype" resultType="com.cyj.domain.Clubtype">
+        select * from clubtype
+        <where>
+            <if test="type != null and type != ''">and type = #{type}</if>
+
+            <if test="id != null and id != ''">and id = #{id}</if>
+
+            <if test="remark != null and remark != ''">and remark like '%${remark}%'</if>
+        </where>
+    </select>
+<select id="findAllClubtype" parameterType="com.cyj.domain.Clubtype" resultType="com.cyj.domain.Clubtype">
+    select * from clubtype
+    <where>
+        <if test="type != null and type != ''">and type = #{type}</if>
+        <if test="id != null and id != ''">and id = #{id}</if>
+        <if test="remark != null and remark != ''">and remark like '%${remark}%'</if>
+    </where>
+</select>
+</mapper>

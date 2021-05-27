@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyj.dao.ClubMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cyj.domain.Club">
+        <id column="id" property="id"/>
+        <result column="type" property="type"/>
+        <result column="chief" property="chief"/>
+        <result column="name" property="name"/>
+        <result column="content" property="content"/>
+        <result column="number" property="number"/>
+        <result column="photo" property="photo"/>
+        <result column="appl_time" property="applTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="remark" property="remark"/>
+        <result column="approver" property="approver"/>
+        <result column="status" property="status"/>
+        <result column="college" property="college"/>
+        <result column="scope" property="scope"/>
+        <result column="count" property="count"></result>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            id, type, chief, name, content, number, photo, appl_time, create_time, remark, approver, status,count,college
+        </sql>
+<!--    <resultMap id="queryClubAllMap" type="com.cyj.domain.Club" extends="BaseResultMap">-->
+<!--        <association property="clubtype" javaType="com.cyj.domain.Clubtype">-->
+<!--            <id column="id" property="id"></id>-->
+<!--            <result column="clubtype" property="clubtype"></result>-->
+<!--        </association>-->
+<!--        <association property="user" javaType="com.cyj.domain.User">-->
+<!--            <id column="id" property="id"></id>-->
+<!--            <result column="username" property="username"></result>-->
+<!--        </association>-->
+<!--    </resultMap>-->
+    <select id="queryClubAll" parameterType="com.cyj.domain.Club" resultType="com.cyj.domain.Club">
+        SELECT `club`.*,clubtype.`type` AS typeName, u1.`username` AS 'studentName',u2.`username` AS 'teacherName'
+        FROM `club`
+        LEFT JOIN `clubtype` ON `club`.`type`=`clubtype`.`id`
+        LEFT JOIN  `user` u1 ON `club`.`chief`=u1.`number`
+        LEFT JOIN  `user` u2 ON `club`.`chief`=u2.`number`
+        <where>
+            <if test="status!=null">
+                 and club.status = #{status}
+            </if>
+
+            <if test="name!=null">
+                and club.name = #{name}
+            </if>
+            <if test="type!=null">
+                and club.type = #{type}
+            </if>
+
+        </where>
+    </select>
+
+<!--    <select id="queryClubAll" resultMap="queryClubAllMap" resultType="com.cyj.domain.Club">-->
+<!--        SELECT * from club-->
+<!--        <where>-->
+<!--            <if test="status != null and status != ''">and status = #{status}</if>-->
+<!--            <if test="name != null and name != ''">and name = #{name}</if>-->
+<!--            <if test="type != null and type != ''">and type = #{type}</if>-->
+<!--        </where>-->
+<!--    </select>-->
+
+    <!--    计算社团人数-->
+    <select id="countClubMember" parameterType="com.cyj.domain.Club"
+            resultType="Integer">
+        SELECT COUNT(*)
+        FROM club c
+        LEFT JOIN member  m ON c.`id`=m.`club_id`
+        <where>
+            <if test="status!=null">
+                and m.status = #{status}
+            </if>
+            <if test="id!=null">
+                and m.club_id = #{id}
+            </if>
+        </where>
+    </select>
+
+<update id="updateCount" parameterType="com.cyj.domain.Club" >
+    update club c
+    set c.count=#{count}
+    <where>
+        <if test="id!=null">
+            and c.id = #{id}
+        </if>
+        <if test="name!=null">
+            and c.name = #{name}
+        </if>
+    </where>
+</update>
+
+    <select id="findChief" parameterType="com.cyj.domain.Club" resultType="String">
+        SELECT `chief`
+        FROM `club` c
+        <where>
+            <if test="id!=null">
+                and c.id = #{id}
+            </if>
+        </where>
+    </select>
+
+    <select id="findIdByName" parameterType="string" resultType="int">
+        select id from club
+        <where>
+            <if test="name!=null">
+                and name = #{name}
+            </if>
+        </where>
+    </select>
+    <select id="count" parameterType="int" resultType="int">
+        select count(*)
+        from club
+        <where>
+            <if test="status!=null">
+                and club.status = #{status}
+            </if>
+        </where>
+    </select>
+</mapper>

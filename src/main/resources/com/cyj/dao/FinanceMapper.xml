@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyj.dao.FinanceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cyj.domain.Finance">
+        <id column="id" property="id"/>
+        <result column="club_id" property="clubId"/>
+        <result column="title" property="title"/>
+        <result column="money" property="money"/>
+        <result column="create_time" property="createTime"/>
+        <result column="begin_time" property="beginTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="status" property="status"/>
+        <result column="creator" property="creator"/>
+        <result column="approver" property="approver"/>
+        <result column="remark" property="remark"/>
+        <result column="check_time" property="checkTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            id, club_id, title, money, create_time, begin_time, end_time, status, creator, approver, remark, check_time
+     </sql>
+<!--    <select id="queryFinanceAll" parameterType="com.cyj.domain.Finance" resultType="com.cyj.domain.Finance">-->
+<!--        select * from finance-->
+<!--        <where>-->
+<!--            <if test="clubId != null and clubId != ''">and clubId = #{clubId}</if>-->
+<!--            <if test="title != null and title != ''">and title = #{title}</if>-->
+<!--            <if test="status != null and status != ''">and status = #{status}</if>-->
+<!--        </where>-->
+<!--    </select>-->
+    <select id="queryFinanceAll" parameterType="com.cyj.domain.Finance" resultType="com.cyj.domain.Finance">
+        SELECT f.*,c.`name` as 'clubName',u.`username` AS 'leaderName',u2.`username` AS 'teacherName'
+        FROM `finance` f
+        LEFT JOIN `club` c ON f.`club_id`=c.`id`
+        LEFT JOIN `user` u ON u.`number`=f.`creator`
+        LEFT JOIN `user` u2 ON u2.`number`=f.`approver`
+        <where>
+            <if test="title!=null">
+                and f.title like '%${title}%'
+            </if>
+            <if test="status!=null">
+                and f.status = #{status}
+            </if>
+            <if test="clubId!=null">
+                and f.club_id = #{clubId}
+            </if>
+            <if test="remark!=null">
+                and f.remark like '%${remark}%'
+            </if>
+            <if test="creator!=null">
+                and f.creator = #{creator}
+            </if>
+
+        </where>
+
+    </select>
+    <delete id="deleteByClubId" parameterType="String">
+        DELETE a
+        FROM finance a
+        JOIN `club` c ON a.`club_id`=c.`id`
+        <where>
+            <if test="clubId!=null">
+                and a.club_id = #{clubId}
+            </if>
+        </where>
+    </delete>
+
+</mapper>
